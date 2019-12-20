@@ -25,7 +25,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -161,7 +160,7 @@
             <configuration>
               <source>1.8</source>
               <target>1.8</target>
-              <release>8</release>
+              <release>11</release>
             </configuration>
           </plugin>
         </plugins>
@@ -173,6 +172,9 @@
     <kafka.version>2.3.0</kafka.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.release>11</maven.compiler.release>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <modules>

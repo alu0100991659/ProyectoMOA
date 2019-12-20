@@ -32,6 +32,8 @@ import moa.tasks.MainTask;
 import moa.tasks.TaskThread;
 import moa.tasks.meta.MetaMainTask;
 
+import java.io.FileOutputStream;
+
 import com.github.javacliparser.FlagOption;
 import com.github.javacliparser.IntOption;
 import com.github.javacliparser.Option;
@@ -63,28 +65,28 @@ public class DoTask {
         double version;
         if (versionStr.contains(".")) {
           parts = versionStr.split("\\.");
-	}
-	else {
-          parts = new String[]{versionStr};
-	}
-	if (parts.length == 1) {
-          try {
-            version = Double.parseDouble(parts[0]);
-	  }
-	  catch (Exception e) {
-            System.err.println("Unparsable Java version: " + versionStr);
-            return false;
-	  }
-	}
-	else {
-          try {
-            version = Double.parseDouble(parts[0]) + Double.parseDouble(parts[1]) / 10;
-	  }
-	  catch (Exception e) {
-            System.err.println("Unparsable Java version: " + versionStr);
-            return false;
-	  }
-	}
+		}
+		else {
+	          parts = new String[]{versionStr};
+		}
+		if (parts.length == 1) {
+	          try {
+	            version = Double.parseDouble(parts[0]);
+		  }
+		  catch (Exception e) {
+	            System.err.println("Unparsable Java version: " + versionStr);
+	            return false;
+		  }
+		}
+		else {
+	          try {
+	            version = Double.parseDouble(parts[0]) + Double.parseDouble(parts[1]) / 10;
+		  }
+		  catch (Exception e) {
+	            System.err.println("Unparsable Java version: " + versionStr);
+	            return false;
+		  }
+		}
         if (version < 1.8) {
             isJavaVersionOK = false;
             System.err.println();
@@ -152,11 +154,12 @@ public class DoTask {
                     statusUpdateFrequencyOption};
                 // build a single string by concatenating cli options
                 StringBuilder cliString = new StringBuilder();
-                for (int i = 0; i < args.length; i++) {
+                for (int i = 0; i < args.length-1; i++) {
                     cliString.append(" ").append(args[i]);
                 }
                 // parse options
                 AbstractTask task;
+                FileOutputStream outputStream = null;
                 try {
                 	task = (AbstractTask) ClassOption.cliStringToObject(
                 			cliString.toString(), MainTask.class, extraOptions);
@@ -166,7 +169,12 @@ public class DoTask {
             				cliString.toString(), MetaMainTask.class, extraOptions);
                 }
                 task.prepareForUse();
-                
+                try {
+                	outputStream = new FileOutputStream(args[args.length-1]);
+                } catch(Exception e){
+                	System.err.println("Output file cannot be opened");
+                	return;
+                }
                 Object result = null;
                 if (suppressStatusOutputOption.isSet()) {
                     result = task.doTask();
@@ -242,6 +250,9 @@ public class DoTask {
                             System.out.println(sb.toString());
                         } else {
                             System.out.println(result);
+                            byte[] strToBytes = (result.toString()).getBytes();
+                            outputStream.write(strToBytes);
+                            outputStream.close();
                         }
                         System.out.flush();
                     }
